@@ -1,0 +1,13 @@
+node_modules/
+/logs/
+env/.env.local
+env/.env.prod
+env/.env.test
+.DS_Store
+public/.DS_Store
+
+.vscode
+.idea
+.vscode/*
+.idea/*
+.serverless
