@@ -1,8 +1,7 @@
-const services = require('../services/quizzes');
+const services = require('../services/quiz');
 
 exports.getQuizzes = async (req, res) => {
   const quizzes = await services.getQuizzes();
-  console.log(quizzes);
   res.send({
     quizzes: quizzes.map((quiz) => {
       return {
@@ -24,7 +23,16 @@ exports.getQuiz = async (req, res) => {
       id: quiz._id,
       name: quiz.name,
       subject: quiz.subject,
-      questions: quiz.questions
+      questions: quiz.questions.map(quest => ({
+        id: quest._id,
+        question: quest.question,
+        answerA: quest.answerA,
+        answerB: quest.answerB,
+        answerC: quest.answerC,
+        answerD: quest.answerD,
+        answer: quest.answer,
+        points: quest.points,
+      })),
     }
   });
 }
