@@ -5,12 +5,14 @@ const Event = require('../models/event');
 const jwt = require('jsonwebtoken');
 
 const secretKey = `æÓqÍ¶A@1¡åÕöÍÛËãûvû5ql´K¾Àk½¸tò§DH;±v:-ëI¼K÷SD½÷«|]úé7ÖOøù%ÿÛD0vá*ÒÄº]õ¡ðI¥ÿRî>¤]ÈqQÓ·»Â?èÀMj²}¯/ôTù¯jHiãoy«~Fw)â¨çO15t¡dÂeÎ[Ô`;
+exports.secretKey = secretKey;
 const baseUri = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? 'http://localhost:3000' : 'https://twij-api.herokuapp.com';
 
 exports.scheduleTest = async (newTest) => {
   const quiz = await Quiz.findById(newTest.quizId);
+  const eventId = new mongoose.Types.ObjectId();
   const event = new Event({
-    _id: new mongoose.Types.ObjectId(),
+    _id: eventId,
     date: new Date().toISOString().slice(0,10),
     name: quiz.name,
     subject: quiz.subject,
@@ -43,9 +45,11 @@ exports.scheduleTest = async (newTest) => {
 
   const emailsOptions = newTest.emails.map(email => {
     const token = jwt.sign({
-      email: email,
+      eventId,
+      email,
     }, secretKey);
-    const link = `${baseUri}/${token}`;
+    const stringToken = decodeURIComponent(token);
+    const link = `${baseUri}/${stringToken}`;
 
     return {
       from: 'quiz.twij@gmail.com',
