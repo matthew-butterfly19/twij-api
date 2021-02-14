@@ -50,7 +50,7 @@ exports.getGameData = async (req, res) => {
       status: GameResponseStatuses.canBeStarted,
       gameData: {
         ...commonQuizProps,
-        startTimeEnd: gameData.startTime,
+        startTimeEnd: gameData.startTimeEnd,
         eventDurationInMinutes: gameData.eventDurationInMinutes,
         questionsCount: gameData.questions.length,
       }
@@ -124,7 +124,7 @@ exports.finishGame = async (req, res) => {
       return [
         ...accum,
         {
-          questionId: question._id,
+          questionId: question.id,
           question: question.question,
           answer: userAnswer,
           points: answer.answer === question.answer ? question.points : 0,

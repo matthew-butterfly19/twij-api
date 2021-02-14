@@ -15,7 +15,10 @@ exports.createQuiz = async (quiz) => {
     date: new Date().toISOString().slice(0,10),
     name: quiz.name,
     subject: quiz.subject,
-    questions: quiz.questions
+    questions: quiz.questions.map(quest => ({
+      _id: new mongoose.Types.ObjectId(),
+      ...quest,
+    }))
   });
   await newQuiz.save();
 }
