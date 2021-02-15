@@ -3,6 +3,7 @@ const nodemailer = require('nodemailer');
 const Quiz = require('../models/quiz');
 const Event = require('../models/event');
 const jwt = require('jsonwebtoken');
+const moment = require('moment');
 
 const secretKey = `æÓqÍ¶A@1¡åÕöÍÛËãûvû5ql´K¾Àk½¸tò§DH;±v:-ëI¼K÷SD½÷«|]úé7ÖOøù%ÿÛD0vá*ÒÄº]õ¡ðI¥ÿRî>¤]ÈqQÓ·»Â?èÀMj²}¯/ôTù¯jHiãoy«~Fw)â¨çO15t¡dÂeÎ[Ô`;
 exports.secretKey = secretKey;
@@ -57,7 +58,7 @@ exports.scheduleTest = async (newTest) => {
       subject: `Zaproszenie na Test ${quiz.name} z przedmiotu ${quiz.subject}`,
       html: `
       <p>${newTest.emailMessage}</p>
-      <p>Data rozpoczęcia quizu: <b>${newTest.startTime.substring(0, 10)} ${newTest.startTime.substring(11, 19)}</b></p>
+      <p>Data rozpoczęcia quizu: <b>${moment(newTest.startTime).format('HH:mm')} ${newTest.startTime.substring(11, 19)}</b></p>
       <p>Czas trwania quizu: <b>${newTest.eventDurationInMinutes} minut</b></p>
       <p>Aby rozpocząć quiz wybierz link poniżej</p>
       <h2><a href="${link}">Link do quizu</a></h2>
