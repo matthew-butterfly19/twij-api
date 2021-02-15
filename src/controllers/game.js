@@ -15,6 +15,9 @@ const GameResponseStatuses = {
 
 exports.getGameData = async (req, res) => {
   const token = req.path.slice(1);
+  if (!token) {
+    res.sendStatus(400);
+  }
   const decodedToken = decodeURIComponent(token);
   const user = jwt.verify(decodedToken, secretKey);
   const { gameData, userGameData } = await services.getGameForUser(user.eventId, user.email);
