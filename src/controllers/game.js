@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const { secretKey } = require('../services/event');
 const services = require('../services/game');
 const moment = require('moment');
-const {UserStatuses} = require("../constants/UserStatuses");
+const {Statuses} = require("../constants/UserStatuses");
 
 const GameResponseStatuses = {
   didntStart: 'didntStart',
@@ -39,13 +39,13 @@ exports.getGameData = async (req, res) => {
     });
     return;
   }
-  if (userGameData.status === UserStatuses.finished) {
+  if (userGameData.status === Statuses.finished) {
     res.send({
       status: GameResponseStatuses.finished,
     });
     return;
   }
-  if (userGameData.status === UserStatuses.awaiting && canBeStarted) {
+  if (userGameData.status === Statuses.awaiting && canBeStarted) {
     res.send({
       status: GameResponseStatuses.canBeStarted,
       gameData: {
@@ -57,26 +57,34 @@ exports.getGameData = async (req, res) => {
     });
     return;
   }
-  if (userGameData.status === UserStatuses.awaiting && !canBeStarted) {
+  if (userGameData.status === Statuses.awaiting && !canBeStarted) {
     res.send({
       status: GameResponseStatuses.timeToStartOver,
     });
     return;
   }
-  const finishTime = moment(userGameData.startTime).add(gameData.eventDurationInMinutes, 'minutes');
+  const finishTime = moment.unix(userGameData.timeStart).add(gameData.eventDurationInMinutes, 'minutes');
   const canBeFinished = finishTime.isAfter(moment());
-  if (userGameData.status === UserStatuses.pending && canBeFinished) {
+  if (userGameData.status === Statuses.pending && canBeFinished) {
     res.send({
       status: GameResponseStatuses.pending,
       gameData: {
         ...commonQuizProps,
         finishTime: finishTime,
-        questions: gameData.questions,
+        questions: gameData.questions.map(quest => ({
+          id: quest.id,
+          question: quest.question,
+          answerA: quest.answerA,
+          answerB: quest.answerB,
+          answerC: quest.answerC,
+          answerD: quest.answerD,
+          answer: -1,
+        })),
       }
     });
     return;
   }
-  if (userGameData.status === UserStatuses.pending && !canBeFinished) {
+  if (userGameData.status === Statuses.pending && !canBeFinished) {
     res.send({
       status: GameResponseStatuses.timeToFinishOver,
     });
@@ -96,7 +104,7 @@ exports.startGame = async (req, res) => {
   }
   const canBeStarted = moment(gameData.startTimeEnd).isAfter(moment(Date.now()));
 
-  if (userGameData.status === UserStatuses.awaiting && canBeStarted) {
+  if (userGameData.status === Statuses.awaiting && canBeStarted) {
     await services.startGameForUser(user.eventId, user.email);
   }
   res.sendStatus(200);
@@ -114,25 +122,29 @@ exports.finishGame = async (req, res) => {
     return;
   }
   const canBeFinished = moment(userGameData.startTime).add(gameData.eventDurationInMinutes, 'minutes').isAfter(moment());
-  if (userGameData.status === UserStatuses.pending && canBeFinished) {
+  if (userGameData.status === Statuses.pending && canBeFinished) {
+    let pointsSummary = 0;
     const answers = reqAnswers.reduce((accum, answer) => {
       const question = gameData.questions.find(quest => quest.id === answer.id);
       if (!question) {
         return accum;
       }
       const userAnswer = [question.answerA, question.answerB, question.answerC, question.answerD][answer.answer];
+      const correctAnswer = [question.answerA, question.answerB, question.answerC, question.answerD][question.answer];
+      const pointsForQuestion = answer.answer === question.answer ? question.points : 0;
+      pointsSummary += pointsForQuestion;
       return [
         ...accum,
         {
           questionId: question.id,
           question: question.question,
-          answer: userAnswer,
+          answer: userAnswer || 'brak odpowiedzi',
           points: answer.answer === question.answer ? question.points : 0,
-          correctAnswer: question.answer,
+          correctAnswer,
           correctAnswerPoints: question.points,
         }];
     }, []);
-    await services.finishGame(user.eventId, user.email, answers);
+    await services.finishGame(user.eventId, user.email, answers, pointsSummary);
     res.sendStatus(200);
   }
 }

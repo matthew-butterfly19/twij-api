@@ -1,5 +1,7 @@
 const Event = require('../models/event');
-const {UserStatuses} = require("../constants/UserStatuses");
+const {Statuses} = require("../constants/UserStatuses");
+const moment = require('moment');
+const mongoose = require('mongoose');
 
 exports.getGameForUser = async (eventId, email) => {
   const event = await Event.findById(eventId);
@@ -18,7 +20,8 @@ exports.getGameForUser = async (eventId, email) => {
         answerB: question.answerB,
         answerC: question.answerC,
         answerD: question.answerD,
-        answer: 0,
+        answer: question.answer,
+        points: question.points,
       })),
     },
     userGameData: userData,
@@ -26,27 +29,29 @@ exports.getGameForUser = async (eventId, email) => {
 }
 
 exports.startGameForUser = async (eventId, email) => {
-  console.log(eventId, email);
   await Event.updateOne(
   {
     _id: eventId,
     members: { $elemMatch: { email }},
   }, {
     $set: {
-      "members.$.status" : UserStatuses.pending,
+      "members.$.status" : Statuses.pending,
+      "members.$.timeStart" : moment(),
     }
   });
 }
 
-exports.finishGame = async (eventId, email, answers) => {
+exports.finishGame = async (eventId, email, answers, points) => {
   await Event.updateOne(
     {
       _id: eventId,
       members: { $elemMatch: { email }},
     }, {
       $set: {
-        "members.$.status" : UserStatuses.finished,
-        "members.&.answers" : answers,
+        "members.$.status" : Statuses.finished,
+        "members.$.timeEnd" : moment(),
+        "members.$.pointsSummary" : points,
+        "members.$.answers" : answers,
       }
     });
 }

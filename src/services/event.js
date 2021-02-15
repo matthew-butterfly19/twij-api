@@ -9,6 +9,10 @@ const secretKey = `æÓqÍ¶A@1¡åÕöÍÛËãûvû5ql´K¾Àk½¸tò§DH;±v:-
 exports.secretKey = secretKey;
 const baseUri = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? 'http://localhost:3000' : 'https://twij-front.herokuapp.com';
 
+exports.getEvents = async () => {
+  return Event.find();
+}
+
 exports.scheduleTest = async (newTest) => {
   const quiz = await Quiz.findById(newTest.quizId);
   const eventId = new mongoose.Types.ObjectId();
@@ -48,6 +52,7 @@ exports.scheduleTest = async (newTest) => {
     const token = jwt.sign({
       eventId,
       email,
+      date: moment().toISOString(),
     }, secretKey);
     const stringToken = decodeURIComponent(token);
     const link = `${baseUri}/${stringToken}`;
