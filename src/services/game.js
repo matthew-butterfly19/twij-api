@@ -36,7 +36,7 @@ exports.startGameForUser = async (eventId, email) => {
   }, {
     $set: {
       "members.$.status" : Statuses.pending,
-      "members.$.timeStart" : moment(),
+      "members.$.timeStart" : moment().toISOString(),
     }
   });
 }
@@ -49,7 +49,7 @@ exports.finishGame = async (eventId, email, answers, points) => {
     }, {
       $set: {
         "members.$.status" : Statuses.finished,
-        "members.$.timeEnd" : moment(),
+        "members.$.timeEnd" : moment().toISOString(),
         "members.$.pointsSummary" : points,
         "members.$.answers" : answers,
       }

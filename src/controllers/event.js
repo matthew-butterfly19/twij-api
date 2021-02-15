@@ -29,20 +29,21 @@ exports.getEvents = async (req, res) => {
       }
       const isTooLateForStart = moment(event.startTimeEnd).isBefore(moment(Date.now()));
       const isSomeonePending = event.members.find(member => member.status !== Statuses.finished);
-      const finishTime = moment.unix(event.timeStart).add(event.eventDurationInMinutes, 'minutes');
+      const finishTime = moment(event.startTimeEnd).add(event.eventDurationInMinutes, 'minutes');
       const isToLateForFinish = finishTime.isAfter(moment());
       if ((isTooLateForStart && !isSomeonePending) || isToLateForFinish) {
         return Statuses.finished;
       }
       return Statuses.pending;
     }
-
+    const maxPoints = event.questions.map(quest => quest.points).reduce((a, b) => a + b, 0);
     return {
       date: event.date,
       name: event.name,
       status: getQuizStatus(),
       startTime: event.startTime,
       subject: event.subject,
+      maxPoints: maxPoints,
       members: event.members.map(memberData => ({
         email: memberData.email,
         status: memberData.status,

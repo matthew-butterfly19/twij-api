@@ -66,7 +66,8 @@ exports.getGameData = async (req, res) => {
     });
     return;
   }
-  const finishTime = moment.unix(userGameData.timeStart).add(gameData.eventDurationInMinutes, 'minutes');
+
+  const finishTime = moment(userGameData.timeStart).add(gameData.eventDurationInMinutes, 'minutes');
   const canBeFinished = finishTime.isAfter(moment());
   if (userGameData.status === Statuses.pending && canBeFinished) {
     res.send({
