@@ -58,7 +58,8 @@ exports.scheduleTest = async (newTest) => {
       subject: `Zaproszenie na Test ${quiz.name} z przedmiotu ${quiz.subject}`,
       html: `
       <p>${newTest.emailMessage}</p>
-      <p>Data rozpoczęcia quizu: <b>${moment(newTest.startTime).format('DD.MM.YYYY HH:mm')}</b></p>
+      <p>Data rozpoczęcia quizu: <b>${moment(newTest.startTime).format('DD.MM.YYYY HH:mm').add(1, 'hours')}</b></p>
+      <p>Quiz będzie dostępny do godziny: <b>${moment(newTest.startTimeEnd).format('DD.MM.YYYY HH:mm').add(1, 'hours')}</b></p>
       <p>Czas trwania quizu: <b>${newTest.eventDurationInMinutes} minut</b></p>
       <p>Aby rozpocząć quiz wybierz link poniżej</p>
       <h2><a href="${link}">Link do quizu</a></h2>
