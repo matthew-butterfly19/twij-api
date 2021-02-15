@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 
 const secretKey = `æÓqÍ¶A@1¡åÕöÍÛËãûvû5ql´K¾Àk½¸tò§DH;±v:-ëI¼K÷SD½÷«|]úé7ÖOøù%ÿÛD0vá*ÒÄº]õ¡ðI¥ÿRî>¤]ÈqQÓ·»Â?èÀMj²}¯/ôTù¯jHiãoy«~Fw)â¨çO15t¡dÂeÎ[Ô`;
 exports.secretKey = secretKey;
-const baseUri = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? 'http://localhost:3000' : 'https://twij-api.herokuapp.com';
+const baseUri = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? 'http://localhost:3000' : 'https://twij-front.herokuapp.com';
 
 exports.scheduleTest = async (newTest) => {
   const quiz = await Quiz.findById(newTest.quizId);

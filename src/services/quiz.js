@@ -27,7 +27,10 @@ exports.updateQuiz = (quiz) => {
   return Quiz.findByIdAndUpdate(quiz.id, {
     name: quiz.name,
     subject: quiz.subject,
-    questions: quiz.questions
+    questions: quiz.questions.map(quest => ({
+      _id: new mongoose.Types.ObjectId(),
+      ...quest,
+    })),
   });
 }
 
